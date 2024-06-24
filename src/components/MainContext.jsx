@@ -9,19 +9,20 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import axios from "axios";
+import moment from "moment";
 import { useState, useEffect } from "react";
 
 export default function MainContext() {
   const [timing, settiming] = useState({
     Fajr: "",
-
     Dhuhr: "",
     Asr: "",
-
     Maghrib: "",
     Isha: "",
   });
-  const [SelectCity, setSelectCity] = useState('safi');
+  const [SelectCity, setSelectCity] = useState("safi");
+  const [Today, setToday] = useState("");
+  const [temps, settemps] = useState(10);
   const getTiming = async () => {
     const data = await axios.get(
       `https://api.aladhan.com/v1/timingsByCity?city=${SelectCity}&country=MAR`
@@ -33,8 +34,53 @@ export default function MainContext() {
 
   useEffect(() => {
     getTiming();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // settemps( t.format('HH:mm:ss'));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [SelectCity]);
+
+  useEffect(() => {
+    const t = moment();
+    setToday(t.format("MM-D-YYYY |HH:mm"));
+    let inet = setInterval(() => {
+      setupCountdownTimer();
+    }, 1000);
+    return () => {
+      clearInterval(inet);
+    };
+  }, []);
+
+  const setupCountdownTimer = () => {
+    const momentNew = moment();
+    let nextPrayer = null;
+    if (
+      momentNew.isAfter(moment(timing["Fajr"], "hh:mm")) &&
+      momentNew.isBefore(moment(timing["Dhuhr"], "hh:mm"))
+    ) {
+      console.log(" next Dhuhr");
+    } else if (
+      momentNew.isAfter(moment(timing["Dhuhr"], "hh:mm")) &&
+      momentNew.isBefore(moment(timing["Asr"], "hh:mm"))
+    ) {
+      console.log(" next Asr");
+    } else if (
+      momentNew.isAfter(moment(timing["Asr"], "hh:mm")) &&
+      momentNew.isBefore(moment(timing["Maghrib"], "hh:mm"))
+    ) {
+      console.log(" next Maghrib");
+    } else if (
+      momentNew.isAfter(moment(timing["Maghrib"], "hh:mm")) &&
+      momentNew.isBefore(moment(timing["Isha"], "hh:mm"))
+    ) {
+      console.log(" next Isha");
+    } else if (
+      momentNew.isAfter(moment(timing["Isha"], "hh:mm")) &&
+      momentNew.isBefore(moment(timing["Fajr"], "hh:mm"))
+    ) {
+      console.log(" next Fajr");
+    }
+  };
   function handleChange(event) {
     setSelectCity(event.target.value);
   }
@@ -49,14 +95,14 @@ export default function MainContext() {
       >
         <Grid xs={6}>
           <div>
-            <h2>date</h2>
+            <h2>{Today}</h2>
             <h1> {SelectCity}</h1>
           </div>
         </Grid>
         <Grid xs={6}>
           <div>
             <h2>Temps</h2>
-            <h1> 00:19:12</h1>
+            <h1> {temps}</h1>
           </div>
         </Grid>
       </Grid>
@@ -109,25 +155,13 @@ export default function MainContext() {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-              value={SelectCity}
-             label="City"
+            value={SelectCity}
+            label="City"
             onChange={handleChange}
           >
-            <MenuItem
-              value={"safi"}
-            >
-              Safi
-            </MenuItem>
-            <MenuItem
-              value={"Rabat"}
-            >
-              Rabat
-            </MenuItem>
-            <MenuItem
-              value={"Casablanca"}
-            >
-              Casablanca
-            </MenuItem>
+            <MenuItem value={"safi"}>Safi</MenuItem>
+            <MenuItem value={"Rabat"}>Rabat</MenuItem>
+            <MenuItem value={"Casablanca"}>Casablanca</MenuItem>
           </Select>
         </FormControl>
       </Stack>

@@ -14,10 +14,10 @@ export default function Prayer({ name ,time ,image}) {
           title="fajar"
         />
         <CardContent>
-          <Typography gutterBottom variant="h4" component="div">
+          <Typography gutterBottom variant="h5" component="div">
             {name}
           </Typography>
-          <Typography variant="h2" color="text.secondary">
+          <Typography variant="h3" color="text.secondary">
             {time}
           </Typography>
         </CardContent>
