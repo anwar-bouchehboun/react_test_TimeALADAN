@@ -1,5 +1,5 @@
 import "./App.css";
-import MainContext from "./components/MainContext.1";
+import MainContext from "./components/MainContext";
 import { Container } from "@mui/material";
 function App() {
   return (
